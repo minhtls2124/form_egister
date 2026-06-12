@@ -1,0 +1,457 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body,div{font-family:'Nunito',sans-serif;color:var(--color-text-primary)}
+.page{display:none}.page.active{display:block}
+
+.hero{background:linear-gradient(135deg,#7F77DD 0%,#D4537E 55%,#EF9F27 100%);padding:2rem 1.5rem 3.5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,rgba(255,255,255,.12),transparent 60%)}
+.sc{position:absolute;inset:0;pointer-events:none}
+.h-icon{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:32px;color:#fff;animation:bIn .6s cubic-bezier(.34,1.56,.64,1)}
+.h-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:.3rem;position:relative}
+.h-sub{font-size:13px;color:rgba(255,255,255,.85);position:relative}
+.pill-row{display:flex;gap:8px;justify-content:center;margin-top:.8rem;position:relative;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;border:1.5px solid rgba(255,255,255,.35)}
+
+.fbody{background:var(--color-background-primary);margin:-1.8rem 1rem 0;border-radius:20px;border:0.5px solid var(--color-border-tertiary);padding:1.5rem;position:relative;z-index:2}
+.slbl{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#7F77DD;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.slbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#AFA9EC,transparent)}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld label{font-size:13px;font-weight:700;color:var(--color-text-primary);display:flex;align-items:center;gap:5px}
+.fld label i{font-size:15px;color:#7F77DD}
+.fi{width:100%;padding:10px 14px;font-size:14px;font-family:'Nunito',sans-serif;border:2px solid #CECBF6;border-radius:12px;background:var(--color-background-primary);color:var(--color-text-primary);transition:border-color .2s,transform .1s;outline:none}
+.fi:focus{border-color:#7F77DD;transform:scale(1.01)}
+.fi::placeholder{color:var(--color-text-tertiary)}
+.em{font-size:12px;color:#A32D2D;font-weight:700;display:none;margin-top:3px}
+.em.show{display:block}
+
+.day-schedule{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.drow{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;border:2px solid var(--color-border-secondary);background:var(--color-background-primary);transition:all .2s}
+.drow.ha{border-color:#7F77DD;background:#EEEDFE}
+.drow.hb{border-color:#D4537E;background:#FBEAF0}
+.dname{font-size:14px;font-weight:800;min-width:80px}
+.ha .dname{color:#3C3489}.hb .dname{color:#72243E}
+.cbtns{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.cbtn{padding:6px 14px;border-radius:20px;border:2px solid var(--color-border-secondary);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all .18s cubic-bezier(.34,1.56,.64,1)}
+.cbtn:hover{transform:scale(1.07)}
+.cbtn.ona{background:linear-gradient(135deg,#7F77DD,#534AB7);color:#fff;border-color:transparent;transform:scale(1.05)}
+.cbtn.onb{background:linear-gradient(135deg,#D4537E,#993556);color:#fff;border-color:transparent;transform:scale(1.05)}
+.cclr{padding:5px 10px;border-radius:20px;border:1.5px solid var(--color-border-tertiary);font-size:12px;font-family:'Nunito',sans-serif;cursor:pointer;background:transparent;color:var(--color-text-tertiary);display:none}
+.cclr:hover{background:var(--color-background-secondary)}
+.dbadge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0}
+.dba{background:#EEEDFE;color:#3C3489}.dbb{background:#FBEAF0;color:#72243E}.dbn{background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+
+.sumbox{background:var(--color-background-secondary);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--color-text-secondary);display:none}
+.sumbox.show{display:block}
+.sumrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.sc-a{background:#EEEDFE;color:#3C3489;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.sc-b{background:#FBEAF0;color:#72243E;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+
+.bsub{width:100%;padding:14px;font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#7F77DD,#D4537E);color:#fff;border:none;border-radius:14px;cursor:pointer;transition:transform .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.bsub:hover{opacity:.9;transform:translateY(-2px)}
+.bsub:active{transform:scale(.98)}
+
+.sucwrap{display:none;padding:2rem 1rem 1.5rem;text-align:center;position:relative}
+.sucwrap.show{display:block}
+.sic{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#5DCAA5,#1D9E75);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:38px;color:#fff;animation:bIn .5s cubic-bezier(.34,1.56,.64,1)}
+.stitle{font-size:22px;font-weight:800;color:#0F6E56;margin-bottom:.4rem}
+.ssub{font-size:14px;color:var(--color-text-secondary);margin-bottom:1rem}
+.scard{background:#E1F5EE;border-radius:14px;padding:14px 16px;text-align:left;font-size:13px;color:#085041;font-weight:600;line-height:2;margin-bottom:1rem}
+.bnew{padding:11px 28px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#7F77DD,#D4537E);color:#fff;border:none;border-radius:12px;cursor:pointer;transition:transform .15s}
+.bnew:hover{transform:scale(1.04)}
+.admin-link{margin-top:12px;font-size:12px;color:var(--color-text-tertiary);cursor:pointer;text-decoration:underline}
+
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.nav-brand{font-size:16px;font-weight:800;color:#3C3489;display:flex;align-items:center;gap:8px}
+.nav-back{font-size:13px;font-weight:700;cursor:pointer;color:#7F77DD;display:flex;align-items:center;gap:4px;border:none;background:none}
+.nav-back:hover{text-decoration:underline}
+
+.login-wrap{max-width:320px;margin:3rem auto;padding:2rem;background:var(--color-background-primary);border-radius:20px;border:0.5px solid var(--color-border-tertiary);text-align:center}
+.lock-icon{width:64px;height:64px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:28px;color:#7F77DD}
+.login-title{font-size:18px;font-weight:800;margin-bottom:.3rem}
+.login-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.2rem}
+.login-err{font-size:12px;color:#A32D2D;font-weight:700;margin-top:8px;display:none}
+.login-err.show{display:block}
+.blogin{width:100%;padding:11px;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#7F77DD,#D4537E);color:#fff;border:none;border-radius:12px;cursor:pointer;margin-top:12px;transition:transform .15s}
+.blogin:hover{transform:scale(1.02)}
+
+.admin-body{padding:1rem 1.25rem}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.25rem}
+.stat-c{background:var(--color-background-secondary);border-radius:12px;padding:12px;text-align:center}
+.stat-n{font-size:26px;font-weight:800}
+.stat-l{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.sn-all{color:#3C3489}.sn-a{color:#534AB7}.sn-b{color:#993556}
+
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+.fbtn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--color-border-secondary);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.fbtn:hover{background:var(--color-background-secondary)}
+.fbtn.fa{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.fbtn.fb{background:#FBEAF0;color:#72243E;border-color:#ED93B1}
+.fbtn.fall{background:linear-gradient(135deg,#7F77DD,#D4537E);color:#fff;border-color:transparent}
+.bexp{padding:7px 14px;border-radius:10px;border:0.5px solid var(--color-border-secondary);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);display:flex;align-items:center;gap:5px;margin-left:auto}
+.bexp:hover{background:var(--color-background-secondary)}
+
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1.5rem}
+.day-col{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:14px;overflow:hidden}
+.dc-head{padding:10px 12px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--color-border-tertiary)}
+.dc-sub{font-size:11px;font-weight:600;color:var(--color-text-secondary)}
+.dc-body{padding:8px}
+.reg-card{padding:8px 10px;border-radius:10px;margin-bottom:6px;font-size:13px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.rc-name{font-weight:800;font-size:13px}
+.rc-ca{font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:3px}
+.rca-a{background:#EEEDFE;color:#3C3489}.rca-b{background:#FBEAF0;color:#72243E}
+.rc-phone{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.empty-day{font-size:12px;color:var(--color-text-tertiary);padding:8px;text-align:center;font-style:italic}
+
+.reglist{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.rl-item{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:14px;padding:12px 14px}
+.rl-top{display:flex;align-items:center;gap:10px}
+.rl-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7F77DD,#D4537E);flex-shrink:0}
+.rl-name{font-size:15px;font-weight:800;flex:1}
+.rl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;padding-left:48px}
+.lt{font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px}
+.lta{background:#EEEDFE;color:#3C3489}.ltb{background:#FBEAF0;color:#72243E}
+.delreg{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:4px;border-radius:8px}
+.delreg:hover{color:#A32D2D;background:#FCEBEB}
+
+.view-tabs{display:flex;gap:0;border-radius:12px;overflow:hidden;border:0.5px solid var(--color-border-secondary);margin-bottom:1rem}
+.vtab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;background:var(--color-background-secondary);color:var(--color-text-secondary);transition:all .15s;border:none;font-family:'Nunito',sans-serif}
+.vtab.on{background:linear-gradient(135deg,#7F77DD,#D4537E);color:#fff}
+
+@keyframes bIn{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+
+<h2 class="sr-only">App đăng ký & quản lý lịch học – Lớp Toán nâng cao 7</h2>
+
+<div id="pgStudent" class="page active">
+  <div class="hero">
+    <canvas class="sc" id="sc1"></canvas>
+    <div class="h-icon"><i class="ti ti-math" aria-hidden="true"></i></div>
+    <div class="h-title">Lớp Toán Nâng Cao 7</div>
+    <div class="h-sub">Chọn ca học riêng cho từng ngày trong tuần!</div>
+    <div class="pill-row">
+      <span class="pill"><i class="ti ti-sun" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Ca A · 6:00–8:00</span>
+      <span class="pill"><i class="ti ti-sun-high" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Ca B · 8:00–10:00</span>
+    </div>
+  </div>
+
+  <div class="fbody" id="formSec">
+    <div class="slbl"><i class="ti ti-user" aria-hidden="true"></i> Thông tin học viên</div>
+    <div class="g2">
+      <div class="fld">
+        <label><i class="ti ti-pencil" aria-hidden="true"></i> Họ và tên <span style="color:#E24B4A">*</span></label>
+        <input class="fi" type="text" id="f-name" placeholder="Nguyễn Văn A..."/>
+        <span class="em" id="err-name">Vui lòng nhập họ tên!</span>
+      </div>
+      <div class="fld">
+        <label><i class="ti ti-cake" aria-hidden="true"></i> Ngày sinh</label>
+        <input class="fi" type="date" id="f-dob"/>
+      </div>
+      <div class="fld">
+        <label><i class="ti ti-phone" aria-hidden="true"></i> SĐT phụ huynh</label>
+        <input class="fi" type="tel" id="f-phone" placeholder="0901 234 567"/>
+      </div>
+      <div class="fld">
+        <label><i class="ti ti-school" aria-hidden="true"></i> Trường đang học</label>
+        <input class="fi" type="text" id="f-school" placeholder="THCS Nguyễn Trãi..."/>
+      </div>
+    </div>
+    <div class="slbl" style="margin-top:6px"><i class="ti ti-calendar-week" aria-hidden="true"></i> Chọn ngày &amp; ca học <span style="color:#E24B4A">*</span></div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px;font-weight:600">Bấm Ca A hoặc Ca B cho từng ngày — có thể khác ca mỗi ngày!</div>
+    <div class="day-schedule" id="daySchedule"></div>
+    <span class="em" id="err-day">Vui lòng chọn ít nhất một ngày học!</span>
+    <div class="sumbox" id="sumbox"><b>Lịch đã chọn:</b><div class="sumrow" id="sumrow"></div></div>
+    <div class="fld" style="margin-top:10px">
+      <label><i class="ti ti-notes" aria-hidden="true"></i> Ghi chú</label>
+      <input class="fi" type="text" id="f-note" placeholder="Yêu cầu đặc biệt..."/>
+    </div>
+    <button class="bsub" onclick="doSubmit()"><i class="ti ti-rocket" style="font-size:20px" aria-hidden="true"></i> Đăng ký ngay!</button>
+    <div style="text-align:center;margin-top:14px">
+      <span class="admin-link" onclick="goAdmin()"><i class="ti ti-lock" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Trang quản trị dành cho giáo viên</span>
+    </div>
+  </div>
+
+  <div class="sucwrap" id="sucSec">
+    <div class="sic"><i class="ti ti-star" aria-hidden="true"></i></div>
+    <div class="stitle">Đăng ký thành công!</div>
+    <div class="ssub" id="sucSub"></div>
+    <div class="scard" id="sucCard"></div>
+    <button class="bnew" onclick="newReg()"><i class="ti ti-plus" style="font-size:15px;vertical-align:-2px" aria-hidden="true"></i> Đăng ký thêm</button>
+    <div><span class="admin-link" onclick="goAdmin()" style="margin-top:10px;display:inline-block"><i class="ti ti-shield" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Vào trang admin</span></div>
+  </div>
+</div>
+
+<div id="pgLogin" class="page">
+  <div class="nav-bar">
+    <div class="nav-brand"><i class="ti ti-math" style="font-size:18px" aria-hidden="true"></i> Toán nâng cao 7</div>
+    <button class="nav-back" onclick="showPage('pgStudent')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Quay lại</button>
+  </div>
+  <div class="login-wrap">
+    <div class="lock-icon"><i class="ti ti-lock" aria-hidden="true"></i></div>
+    <div class="login-title">Trang quản trị</div>
+    <div class="login-sub">Chỉ dành cho giáo viên / admin</div>
+    <input class="fi" type="password" id="pwInput" placeholder="Nhập mật khẩu..." style="text-align:center" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="login-err" id="loginErr">Mật khẩu không đúng!</div>
+    <button class="blogin" onclick="doLogin()"><i class="ti ti-shield-check" style="font-size:16px;vertical-align:-2px" aria-hidden="true"></i> Đăng nhập</button>
+  </div>
+</div>
+
+<div id="pgAdmin" class="page">
+  <div class="nav-bar">
+    <div class="nav-brand"><i class="ti ti-shield-check" style="font-size:18px;color:#0F6E56" aria-hidden="true"></i> Admin – Toán nâng cao 7</div>
+    <button class="nav-back" onclick="showPage('pgStudent')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Thoát</button>
+  </div>
+  <div class="admin-body">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="filter-row">
+      <button class="fbtn fall" id="fAll" onclick="setFilter('all')">Tất cả</button>
+      <button class="fbtn" id="fA" onclick="setFilter('A')"><i class="ti ti-sun" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca A</button>
+      <button class="fbtn" id="fB" onclick="setFilter('B')"><i class="ti ti-sun-high" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca B</button>
+      <button class="bexp" onclick="exportAdmin()"><i class="ti ti-download" style="font-size:14px" aria-hidden="true"></i> Xuất file</button>
+    </div>
+    <div class="view-tabs">
+      <button class="vtab on" id="vBoard" onclick="setView('board')"><i class="ti ti-layout-columns" style="font-size:14px;vertical-align:-2px" aria-hidden="true"></i> Theo ngày</button>
+      <button class="vtab" id="vList" onclick="setView('list')"><i class="ti ti-list" style="font-size:14px;vertical-align:-2px" aria-hidden="true"></i> Danh sách</button>
+    </div>
+    <div id="boardView"></div>
+    <div id="listView" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const DAYS=[{k:'T2',l:'Thứ 2'},{k:'T3',l:'Thứ 3'},{k:'T4',l:'Thứ 4'},{k:'T5',l:'Thứ 5'},{k:'T6',l:'Thứ 6'},{k:'T7',l:'Thứ 7'},{k:'CN',l:'Chủ nhật'}];
+const ADMIN_PW='admin123';
+let chosen={};
+let regs=[];
+let curFilter='all';
+let curView='board';
+
+function loadRegs(){
+  try{const s=localStorage.getItem('toan7_regs');if(s)regs=JSON.parse(s);}catch(e){}
+}
+function saveRegs(){
+  try{localStorage.setItem('toan7_regs',JSON.stringify(regs));}catch(e){}
+}
+loadRegs();
+
+(function stars(){
+  const c=document.getElementById('sc1');if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.parentElement.offsetWidth||680,H=c.parentElement.offsetHeight||220;
+  c.width=W;c.height=H;
+  const s=Array.from({length:40},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.5,a:Math.random(),da:(Math.random()*.02+.005)*(Math.random()<.5?1:-1)}));
+  function draw(){ctx.clearRect(0,0,W,H);s.forEach(p=>{p.a+=p.da;if(p.a>1||p.a<0)p.da=-p.da;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.a.toFixed(2)})`;ctx.fill();});requestAnimationFrame(draw);}
+  draw();
+})();
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='pgAdmin') renderAdmin();
+}
+
+function buildDayRows(){
+  const wrap=document.getElementById('daySchedule');wrap.innerHTML='';
+  DAYS.forEach(d=>{
+    const row=document.createElement('div');
+    row.className='drow';row.id='row-'+d.k;
+    row.innerHTML=`<span class="dname"><i class="ti ti-calendar-event" style="font-size:13px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>${d.l}</span>
+    <div class="cbtns">
+      <button class="cbtn" id="bA-${d.k}" onclick="pickCa('${d.k}','A')"><i class="ti ti-sun" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca A <span style="opacity:.7;font-size:11px">6–8h</span></button>
+      <button class="cbtn" id="bB-${d.k}" onclick="pickCa('${d.k}','B')"><i class="ti ti-sun-high" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca B <span style="opacity:.7;font-size:11px">8–10h</span></button>
+      <button class="cclr" id="bc-${d.k}" onclick="clearCa('${d.k}')">✕ Bỏ</button>
+    </div>
+    <span class="dbadge dbn" id="db-${d.k}">Chưa chọn</span>`;
+    wrap.appendChild(row);
+  });
+}
+
+function pickCa(day,ca){
+  chosen[day]=ca;
+  document.getElementById('row-'+day).className='drow h'+ca.toLowerCase();
+  document.getElementById('bA-'+day).className='cbtn'+(ca==='A'?' ona':'');
+  document.getElementById('bB-'+day).className='cbtn'+(ca==='B'?' onb':'');
+  document.getElementById('bc-'+day).style.display='';
+  const db=document.getElementById('db-'+day);
+  db.className='dbadge db'+ca.toLowerCase();db.textContent='Ca '+ca;
+  document.getElementById('err-day').classList.remove('show');
+  updateSum();
+}
+
+function clearCa(day){
+  delete chosen[day];
+  document.getElementById('row-'+day).className='drow';
+  document.getElementById('bA-'+day).className='cbtn';
+  document.getElementById('bB-'+day).className='cbtn';
+  document.getElementById('bc-'+day).style.display='none';
+  const db=document.getElementById('db-'+day);
+  db.className='dbadge dbn';db.textContent='Chưa chọn';
+  updateSum();
+}
+
+function updateSum(){
+  const box=document.getElementById('sumbox'),row=document.getElementById('sumrow');
+  const ks=Object.keys(chosen);
+  if(!ks.length){box.classList.remove('show');return;}
+  box.classList.add('show');
+  row.innerHTML=ks.map(k=>{const d=DAYS.find(x=>x.k===k);const ca=chosen[k];return `<span class="sc-${ca.toLowerCase()}">${d.l} · Ca ${ca}</span>`;}).join('');
+}
+
+function doSubmit(){
+  const name=document.getElementById('f-name').value.trim();
+  let ok=true;
+  if(!name){document.getElementById('err-name').classList.add('show');ok=false;}
+  else document.getElementById('err-name').classList.remove('show');
+  if(!Object.keys(chosen).length){document.getElementById('err-day').classList.add('show');ok=false;}
+  if(!ok)return;
+  const rec={id:Date.now(),name,dob:document.getElementById('f-dob').value,phone:document.getElementById('f-phone').value.trim(),school:document.getElementById('f-school').value.trim(),note:document.getElementById('f-note').value.trim(),schedule:{...chosen},ts:new Date().toLocaleString('vi-VN')};
+  regs.push(rec);saveRegs();
+  const tags=DAYS.filter(d=>rec.schedule[d.k]).map(d=>{const ca=rec.schedule[d.k];return `<span class="sc-${ca.toLowerCase()}">${d.l}: Ca ${ca} (${ca==='A'?'6–8h':'8–10h'})</span>`;}).join(' ');
+  document.getElementById('sucSub').textContent=`Chào mừng ${name} đến với lớp Toán nâng cao 7!`;
+  document.getElementById('sucCard').innerHTML=`<div><b>Họ tên:</b> ${name}</div>`+(rec.phone?`<div><b>SĐT PH:</b> ${rec.phone}</div>`:'')+`<div style="margin-top:6px"><b>Lịch học:</b></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">${tags}</div>`;
+  document.getElementById('formSec').style.display='none';
+  document.getElementById('sucSec').classList.add('show');
+  confetti();
+}
+
+function newReg(){
+  chosen={};
+  document.getElementById('sucSec').classList.remove('show');
+  document.getElementById('formSec').style.display='block';
+  ['f-name','f-dob','f-phone','f-school','f-note'].forEach(id=>document.getElementById(id).value='');
+  buildDayRows();
+  document.getElementById('sumbox').classList.remove('show');
+  ['err-name','err-day'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+function goAdmin(){showPage('pgLogin');document.getElementById('pwInput').value='';document.getElementById('loginErr').classList.remove('show');}
+
+function doLogin(){
+  const pw=document.getElementById('pwInput').value;
+  if(pw===ADMIN_PW){showPage('pgAdmin');}
+  else{document.getElementById('loginErr').classList.add('show');}
+}
+
+function setFilter(f){
+  curFilter=f;
+  document.getElementById('fAll').className='fbtn'+(f==='all'?' fall':'');
+  document.getElementById('fA').className='fbtn'+(f==='A'?' fa':'');
+  document.getElementById('fB').className='fbtn'+(f==='B'?' fb':'');
+  renderAdmin();
+}
+
+function setView(v){
+  curView=v;
+  document.getElementById('vBoard').className='vtab'+(v==='board'?' on':'');
+  document.getElementById('vList').className='vtab'+(v==='list'?' on':'');
+  document.getElementById('boardView').style.display=v==='board'?'':'none';
+  document.getElementById('listView').style.display=v==='list'?'':'none';
+  renderAdmin();
+}
+
+function filteredRegs(){
+  if(curFilter==='all') return regs;
+  return regs.filter(r=>Object.values(r.schedule).includes(curFilter));
+}
+
+function renderAdmin(){
+  loadRegs();
+  const cntA=regs.filter(r=>Object.values(r.schedule).includes('A')).length;
+  const cntB=regs.filter(r=>Object.values(r.schedule).includes('B')).length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-c"><div class="stat-n sn-all">${regs.length}</div><div class="stat-l">Tổng học viên</div></div>
+    <div class="stat-c"><div class="stat-n sn-a">${cntA}</div><div class="stat-l">Có ca A</div></div>
+    <div class="stat-c"><div class="stat-n sn-b">${cntB}</div><div class="stat-l">Có ca B</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#BA7517">${DAYS.filter(d=>regs.some(r=>r.schedule[d.k])).length}</div><div class="stat-l">Ngày có học</div></div>`;
+  if(curView==='board') renderBoard();
+  else renderList();
+}
+
+function renderBoard(){
+  const fr=filteredRegs();
+  const bv=document.getElementById('boardView');
+  bv.innerHTML='<div class="board">'+DAYS.map(d=>{
+    const slots=fr.filter(r=>r.schedule[d.k]);
+    const aSlots=slots.filter(r=>r.schedule[d.k]==='A');
+    const bSlots=slots.filter(r=>r.schedule[d.k]==='B');
+    const headColor=slots.length?'background:linear-gradient(90deg,#EEEDFE,#FBEAF0)':'background:var(--color-background-secondary)';
+    let html=`<div class="day-col"><div class="dc-head" style="${headColor}"><span style="font-weight:800;color:#3C3489">${d.l}</span><span class="dc-sub">${slots.length} học viên</span></div><div class="dc-body">`;
+    if(!slots.length){html+=`<div class="empty-day">Chưa có ai</div>`;}
+    else{
+      if(aSlots.length){html+=`<div style="font-size:11px;font-weight:800;color:#534AB7;margin-bottom:4px;padding:2px 6px;background:#EEEDFE;border-radius:8px;display:inline-block">Ca A · 6–8h</div>`;
+      aSlots.forEach(r=>{html+=`<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`;});}
+      if(bSlots.length){html+=`<div style="font-size:11px;font-weight:800;color:#993556;margin:6px 0 4px;padding:2px 6px;background:#FBEAF0;border-radius:8px;display:inline-block">Ca B · 8–10h</div>`;
+      bSlots.forEach(r=>{html+=`<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`;});}
+    }
+    html+=`</div></div>`;return html;
+  }).join('')+'</div>';
+}
+
+function renderList(){
+  const fr=filteredRegs();
+  const lv=document.getElementById('listView');
+  if(!fr.length){lv.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px">Chưa có học viên nào đăng ký</div>`;return;}
+  lv.innerHTML='<div class="reglist">'+fr.map((r,i)=>{
+    const init=r.name.split(' ').slice(-2).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+    const tags=DAYS.filter(d=>r.schedule[d.k]).map(d=>{const ca=r.schedule[d.k];return `<span class="lt lt${ca.toLowerCase()}">${d.l} Ca${ca}</span>`;}).join('');
+    return `<div class="rl-item">
+      <div class="rl-top">
+        <div class="rl-av">${init}</div>
+        <div style="flex:1">
+          <div class="rl-name">${r.name}</div>
+          ${r.phone?`<div style="font-size:12px;color:var(--color-text-secondary)">${r.phone}${r.school?' · '+r.school:''}</div>`:''}
+        </div>
+        <button class="delreg" onclick="delReg('${r.id}')" aria-label="Xoá ${r.name}"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button>
+      </div>
+      <div class="rl-tags">${tags}</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function delReg(id){
+  regs=regs.filter(r=>String(r.id)!==String(id));
+  saveRegs();renderAdmin();
+}
+
+function exportAdmin(){
+  if(!regs.length)return;
+  let t='DANH SÁCH ĐĂNG KÝ – LỚP TOÁN NÂNG CAO 7\n'+'='.repeat(45)+'\n\n';
+  t+='THEO TỪNG NGÀY:\n'+'-'.repeat(30)+'\n';
+  DAYS.forEach(d=>{
+    const sl=regs.filter(r=>r.schedule[d.k]);
+    if(!sl.length)return;
+    t+=`\n${d.l}:\n`;
+    ['A','B'].forEach(ca=>{
+      const cs=sl.filter(r=>r.schedule[d.k]===ca);
+      if(cs.length) t+=`  Ca ${ca} (${ca==='A'?'6:00-8:00':'8:00-10:00'}): ${cs.map(r=>r.name).join(', ')}\n`;
+    });
+  });
+  t+='\nDANH SÁCH HỌC VIÊN:\n'+'-'.repeat(30)+'\n';
+  regs.forEach((r,i)=>{
+    t+=`${i+1}. ${r.name}\n`;
+    if(r.phone) t+=`   SĐT: ${r.phone}\n`;
+    if(r.school) t+=`   Trường: ${r.school}\n`;
+    t+='   Lịch:\n';
+    DAYS.filter(d=>r.schedule[d.k]).forEach(d=>{const ca=r.schedule[d.k];t+=`     ${d.l}: Ca ${ca} (${ca==='A'?'6:00-8:00':'8:00-10:00'})\n`;});
+    t+='\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));
+  a.download='admin_toan_nang_cao_7.txt';a.click();
+}
+
+function confetti(){
+  const colors=['#7F77DD','#D4537E','#EF9F27','#5DCAA5','#378ADD'];
+  const c=document.getElementById('sucSec');c.style.position='relative';
+  for(let i=0;i<52;i++){
+    const el=document.createElement('div');const sz=Math.random()*8+5;
+    el.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'3px'};background:${colors[Math.floor(Math.random()*colors.length)]};top:0;left:${Math.random()*100}%;pointer-events:none;z-index:10`;
+    c.appendChild(el);
+    el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:`translate(${(Math.random()-.5)*200}px,${Math.random()*280+80}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:1200+Math.random()*800,delay:Math.random()*300,easing:'cubic-bezier(.25,.46,.45,.94)',fill:'forwards'}).onfinish=()=>el.remove();
+  }
+}
+
+buildDayRows();
+</script>
