@@ -1,0 +1,224 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.header{padding:1.25rem 1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:12px}
+.header-icon{width:40px;height:40px;border-radius:var(--border-radius-md);background:#EEEDFE;display:flex;align-items:center;justify-content:center;color:#534AB7;font-size:20px}
+.header-title{font-size:18px;font-weight:500}
+.header-sub{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+.controls{padding:1rem 1.5rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:0.5px solid var(--color-border-tertiary)}
+.controls label{font-size:13px;color:var(--color-text-secondary)}
+.controls select,.controls input[type=text]{font-size:13px;padding:6px 10px;height:32px}
+.btn{font-size:13px;padding:6px 14px;height:32px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:#534AB7;color:#fff;border:none;border-radius:var(--border-radius-md)}
+.btn-primary:hover{background:#3C3489}
+.btn-danger{background:var(--color-background-danger);color:var(--color-text-danger);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+.btn-danger:hover{opacity:0.8}
+.btn-export{background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+.grid-wrap{padding:1rem 1.5rem;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)}
+.th-session{text-align:left}
+td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;font-size:13px}
+.td-session{font-weight:500;font-size:13px;white-space:nowrap}
+.session-a{color:#534AB7}
+.session-b{color:#0F6E56}
+.slot{display:inline-flex;align-items:center;gap:4px;background:#EEEDFE;color:#3C3489;border-radius:20px;padding:3px 9px 3px 7px;margin:2px;font-size:12px;font-weight:500;cursor:pointer}
+.slot:hover{background:#CECBF6}
+.slot .del{color:#534AB7;font-size:14px;line-height:1}
+.slot.session-b-chip{background:#E1F5EE;color:#085041}
+.slot.session-b-chip .del{color:#0F6E56}
+.add-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;border:0.5px dashed var(--color-border-secondary);color:var(--color-text-secondary);font-size:12px;cursor:pointer;background:transparent;margin:2px}
+.add-btn:hover{background:var(--color-background-secondary)}
+.summary{padding:0.75rem 1.5rem;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:1rem;flex-wrap:wrap}
+.stat{font-size:13px;color:var(--color-text-secondary)}
+.stat b{color:var(--color-text-primary);font-weight:500}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1.25rem;min-width:280px;max-width:360px;width:100%}
+.modal h3{font-size:16px;font-weight:500;margin-bottom:12px}
+.modal label{font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px;margin-top:10px}
+.modal input,.modal select{width:100%;font-size:13px;padding:7px 10px;height:34px}
+.modal-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.legend{display:flex;gap:12px;align-items:center;padding:0.5rem 1.5rem 0;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+</style>
+
+<h2 class="sr-only">Công cụ sắp xếp lịch học – Lớp toán nâng cao 7</h2>
+
+<div class="header">
+  <div class="header-icon" aria-hidden="true"><i class="ti ti-school"></i></div>
+  <div>
+    <div class="header-title">Lớp toán nâng cao 7</div>
+    <div class="header-sub">Sắp xếp lịch học theo ca — 6:00–8:00 & 8:00–10:00</div>
+  </div>
+</div>
+
+<div class="controls">
+  <label>Thêm học viên:</label>
+  <input type="text" id="newStudent" placeholder="Tên học viên..." style="width:160px" />
+  <select id="newDay">
+    <option value="T2">Thứ 2</option>
+    <option value="T3">Thứ 3</option>
+    <option value="T4">Thứ 4</option>
+    <option value="T5">Thứ 5</option>
+    <option value="T6">Thứ 6</option>
+    <option value="T7">Thứ 7</option>
+    <option value="CN">Chủ nhật</option>
+  </select>
+  <select id="newSession">
+    <option value="A">Ca A (6:00–8:00)</option>
+    <option value="B">Ca B (8:00–10:00)</option>
+  </select>
+  <button class="btn btn-primary" onclick="addEntry()"><i class="ti ti-plus" aria-hidden="true"></i> Thêm</button>
+  <button class="btn btn-export" onclick="exportSchedule()"><i class="ti ti-download" aria-hidden="true"></i> Xuất lịch</button>
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#534AB7"></div> Ca A: 6:00–8:00</div>
+  <div class="leg"><div class="leg-dot" style="background:#0F6E56"></div> Ca B: 8:00–10:00</div>
+</div>
+
+<div class="grid-wrap">
+<table id="scheduleTable">
+<thead>
+<tr>
+  <th class="th-session">Ca học</th>
+  <th>Thứ 2</th><th>Thứ 3</th><th>Thứ 4</th><th>Thứ 5</th><th>Thứ 6</th><th>Thứ 7</th><th>Chủ nhật</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>Thêm học viên vào ô</h3>
+    <label>Tên học viên</label>
+    <input type="text" id="modalName" placeholder="Nhập tên..." />
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()" style="border-radius:var(--border-radius-md)">Huỷ</button>
+      <button class="btn btn-primary" onclick="confirmModal()"><i class="ti ti-check" aria-hidden="true"></i> Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS = ['T2','T3','T4','T5','T6','T7','CN'];
+const DAY_LABELS = {'T2':'Thứ 2','T3':'Thứ 3','T4':'Thứ 4','T5':'Thứ 5','T6':'Thứ 6','T7':'Thứ 7','CN':'Chủ nhật'};
+const SESSIONS = {A:{label:'Ca A',time:'6:00 – 8:00',cls:'session-a',chip:''},B:{label:'Ca B',time:'8:00 – 10:00',cls:'session-b',chip:'session-b-chip'}};
+
+let schedule = {A:{},B:{}};
+DAYS.forEach(d=>{schedule.A[d]=[];schedule.B[d]=[];});
+
+// Sample data
+[['Nguyễn Minh','T2','A'],['Trần Lan','T2','A'],['Lê Hùng','T2','B'],
+ ['Phạm Ngọc','T3','A'],['Hoàng Mai','T3','B'],['Đỗ Tuấn','T3','B'],
+ ['Vũ Thảo','T4','A'],['Bùi Khoa','T4','A'],['Dương Hà','T4','B'],
+ ['Ngô Anh','T5','A'],['Đinh Linh','T5','B'],['Lý Quân','T6','A'],
+ ['Trịnh Tú','T6','B'],['Đặng Nam','T7','A'],['Hồ Phương','CN','B']
+].forEach(([name,day,ses])=>schedule[ses][day].push(name));
+
+let pendingCell=null;
+
+function render(){
+  const tbody=document.getElementById('tableBody');
+  tbody.innerHTML='';
+  ['A','B'].forEach(ses=>{
+    const s=SESSIONS[ses];
+    const tr=document.createElement('tr');
+    const tdSes=document.createElement('td');
+    tdSes.className='td-session '+s.cls;
+    tdSes.innerHTML=`<div>${s.label}</div><div style="font-weight:400;color:var(--color-text-secondary);font-size:12px">${s.time}</div>`;
+    tr.appendChild(tdSes);
+    DAYS.forEach(day=>{
+      const td=document.createElement('td');
+      const students=schedule[ses][day];
+      students.forEach((name,i)=>{
+        const chip=document.createElement('span');
+        chip.className='slot '+(ses==='B'?'session-b-chip':'');
+        chip.innerHTML=`<i class="ti ti-user" style="font-size:12px" aria-hidden="true"></i>${name}<span class="del" onclick="removeStudent('${ses}','${day}',${i})" title="Xoá" aria-label="Xoá ${name}">×</span>`;
+        td.appendChild(chip);
+      });
+      const addB=document.createElement('button');
+      addB.className='add-btn';
+      addB.setAttribute('aria-label',`Thêm học viên vào ${s.label} ${DAY_LABELS[day]}`);
+      addB.innerHTML=`<i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i>`;
+      addB.onclick=()=>openModal(ses,day);
+      td.appendChild(addB);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  renderSummary();
+}
+
+function renderSummary(){
+  let totalA=0,totalB=0;
+  DAYS.forEach(d=>{totalA+=schedule.A[d].length;totalB+=schedule.B[d].length;});
+  const div=document.getElementById('summary');
+  div.innerHTML=`<span class="stat">Tổng học viên: <b>${totalA+totalB}</b></span><span class="stat">Ca A: <b>${totalA}</b></span><span class="stat">Ca B: <b>${totalB}</b></span>`;
+}
+
+function addEntry(){
+  const name=document.getElementById('newStudent').value.trim();
+  const day=document.getElementById('newDay').value;
+  const ses=document.getElementById('newSession').value;
+  if(!name)return;
+  schedule[ses][day].push(name);
+  document.getElementById('newStudent').value='';
+  render();
+}
+
+function removeStudent(ses,day,idx){
+  schedule[ses][day].splice(idx,1);
+  render();
+}
+
+function openModal(ses,day){
+  pendingCell={ses,day};
+  document.getElementById('modalName').value='';
+  document.getElementById('modalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('modalName').focus(),50);
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+  pendingCell=null;
+}
+
+function confirmModal(){
+  const name=document.getElementById('modalName').value.trim();
+  if(!name||!pendingCell)return;
+  schedule[pendingCell.ses][pendingCell.day].push(name);
+  closeModal();
+  render();
+}
+
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+document.getElementById('modalName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmModal();});
+document.getElementById('newStudent').addEventListener('keydown',e=>{if(e.key==='Enter')addEntry();});
+
+function exportSchedule(){
+  let text='LỊCH HỌC – LỚP TOÁN NÂNG CAO 7\n';
+  text+='Ca A: 6:00–8:00 | Ca B: 8:00–10:00\n\n';
+  ['A','B'].forEach(ses=>{
+    text+=`=== ${SESSIONS[ses].label} (${SESSIONS[ses].time}) ===\n`;
+    DAYS.forEach(day=>{
+      const list=schedule[ses][day];
+      if(list.length)text+=`  ${DAY_LABELS[day]}: ${list.join(', ')}\n`;
+    });
+    text+='\n';
+  });
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='lich_hoc_toan_nang_cao_7.txt';
+  a.click();
+}
+
+render();
+</script>

@@ -1,0 +1,285 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{font-family:var(--font-sans);color:var(--color-text-primary)}
+.top-bar{padding:1.25rem 1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:12px}
+.top-icon{width:42px;height:42px;border-radius:var(--border-radius-md);background:#EEEDFE;display:flex;align-items:center;justify-content:center;color:#534AB7;font-size:22px;flex-shrink:0}
+.top-title{font-size:18px;font-weight:500}
+.top-sub{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+.form-card{margin:1.25rem 1.5rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:13px;color:var(--color-text-secondary)}
+.field input,.field select{font-size:14px;padding:8px 10px;width:100%}
+.field .hint{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.sess-group{display:flex;flex-direction:column;gap:6px}
+.sess-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:2px}
+.radio-row{display:flex;gap:10px;flex-wrap:wrap}
+.radio-opt{display:flex;align-items:center;gap:7px;padding:8px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;transition:background .15s}
+.radio-opt:hover{background:var(--color-background-secondary)}
+.radio-opt.active-a{border-color:#534AB7;background:#EEEDFE;color:#3C3489}
+.radio-opt.active-b{border-color:#0F6E56;background:#E1F5EE;color:#085041}
+.radio-opt input{display:none}
+.day-grid{display:flex;gap:6px;flex-wrap:wrap}
+.day-btn{padding:6px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;background:transparent;color:var(--color-text-primary)}
+.day-btn:hover{background:var(--color-background-secondary)}
+.day-btn.sel{border-color:#534AB7;background:#EEEDFE;color:#3C3489;font-weight:500}
+.submit-row{display:flex;gap:10px;align-items:center;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)}
+.btn-submit{background:#534AB7;color:#fff;border:none;border-radius:var(--border-radius-md);padding:9px 20px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn-submit:hover{background:#3C3489}
+.btn-reset{background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 16px;font-size:14px;cursor:pointer;color:var(--color-text-secondary)}
+.btn-reset:hover{background:var(--color-background-secondary)}
+.err{font-size:12px;color:var(--color-text-danger);display:none;margin-top:3px}
+.err.show{display:block}
+.success-banner{display:none;margin:0 1.5rem;padding:12px 16px;background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-success);align-items:center;gap:8px}
+.success-banner.show{display:flex}
+.list-section{margin:0 1.5rem 1.5rem}
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.list-title{font-size:15px;font-weight:500}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat-pill{font-size:12px;padding:3px 10px;border-radius:20px}
+.stat-a{background:#EEEDFE;color:#3C3489}
+.stat-b{background:#E1F5EE;color:#085041}
+.stat-all{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.btn-export{font-size:13px;padding:5px 12px;border-radius:var(--border-radius-md);cursor:pointer;background:transparent;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);display:inline-flex;align-items:center;gap:5px}
+.btn-export:hover{background:var(--color-background-secondary)}
+.list-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.list-table th{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-align:left;padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);letter-spacing:.03em}
+.list-table td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.badge-a{background:#EEEDFE;color:#3C3489}
+.badge-b{background:#E1F5EE;color:#085041}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:3px 6px;border-radius:var(--border-radius-md);font-size:14px}
+.del-btn:hover{color:var(--color-text-danger);background:var(--color-background-danger)}
+.empty{padding:2rem;text-align:center;color:var(--color-text-tertiary);font-size:13px}
+</style>
+
+<h2 class="sr-only">Form đăng ký học viên – Lớp toán nâng cao 7</h2>
+
+<div class="wrap">
+  <div class="top-bar">
+    <div class="top-icon" aria-hidden="true"><i class="ti ti-clipboard-list"></i></div>
+    <div>
+      <div class="top-title">Đăng ký học – Lớp toán nâng cao 7</div>
+      <div class="top-sub">Hai ca học: Ca A (6:00–8:00) &nbsp;·&nbsp; Ca B (8:00–10:00)</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-grid">
+      <div class="field">
+        <label for="f-name">Họ và tên học viên <span style="color:var(--color-text-danger)">*</span></label>
+        <input type="text" id="f-name" placeholder="Nguyễn Văn A" />
+        <span class="err" id="err-name">Vui lòng nhập họ tên</span>
+      </div>
+      <div class="field">
+        <label for="f-dob">Ngày sinh</label>
+        <input type="date" id="f-dob" />
+      </div>
+      <div class="field">
+        <label for="f-phone">Số điện thoại phụ huynh</label>
+        <input type="tel" id="f-phone" placeholder="0901 234 567" />
+      </div>
+      <div class="field">
+        <label for="f-school">Trường đang học</label>
+        <input type="text" id="f-school" placeholder="THCS Nguyễn Trãi..." />
+      </div>
+    </div>
+
+    <div style="margin-top:14px" class="field">
+      <div class="sess-label">Ca học <span style="color:var(--color-text-danger)">*</span></div>
+      <div class="radio-row" id="sess-group">
+        <label class="radio-opt" id="opt-a" onclick="selectSess('A')">
+          <input type="radio" name="sess" value="A" />
+          <i class="ti ti-sun" style="font-size:16px" aria-hidden="true"></i>
+          Ca A &nbsp;<span style="color:var(--color-text-secondary);font-size:12px">6:00 – 8:00</span>
+        </label>
+        <label class="radio-opt" id="opt-b" onclick="selectSess('B')">
+          <input type="radio" name="sess" value="B" />
+          <i class="ti ti-sun-high" style="font-size:16px" aria-hidden="true"></i>
+          Ca B &nbsp;<span style="color:var(--color-text-secondary);font-size:12px">8:00 – 10:00</span>
+        </label>
+      </div>
+      <span class="err" id="err-sess">Vui lòng chọn ca học</span>
+    </div>
+
+    <div style="margin-top:14px" class="field">
+      <div class="sess-label">Ngày học trong tuần <span style="color:var(--color-text-danger)">*</span></div>
+      <div class="day-grid" id="day-grid">
+        <button class="day-btn" onclick="toggleDay('T2')">T2</button>
+        <button class="day-btn" onclick="toggleDay('T3')">T3</button>
+        <button class="day-btn" onclick="toggleDay('T4')">T4</button>
+        <button class="day-btn" onclick="toggleDay('T5')">T5</button>
+        <button class="day-btn" onclick="toggleDay('T6')">T6</button>
+        <button class="day-btn" onclick="toggleDay('T7')">T7</button>
+        <button class="day-btn" onclick="toggleDay('CN')">CN</button>
+      </div>
+      <span class="hint">Có thể chọn nhiều ngày</span>
+      <span class="err" id="err-day">Vui lòng chọn ít nhất một ngày</span>
+    </div>
+
+    <div class="field" style="margin-top:14px">
+      <label for="f-note">Ghi chú</label>
+      <input type="text" id="f-note" placeholder="Dị ứng, yêu cầu đặc biệt..." />
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-submit" onclick="submitForm()"><i class="ti ti-check" aria-hidden="true"></i> Đăng ký</button>
+      <button class="btn-reset" onclick="resetForm()">Làm lại</button>
+    </div>
+  </div>
+
+  <div class="success-banner" id="success-banner">
+    <i class="ti ti-circle-check" style="font-size:18px" aria-hidden="true"></i>
+    <span id="success-msg">Đăng ký thành công!</span>
+  </div>
+
+  <div class="list-section" id="list-section" style="display:none">
+    <div class="list-header">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="list-title">Danh sách đăng ký</span>
+        <div class="stats" id="stats"></div>
+      </div>
+      <button class="btn-export" onclick="exportList()"><i class="ti ti-download" style="font-size:14px" aria-hidden="true"></i> Xuất</button>
+    </div>
+    <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th style="width:30%">Họ tên</th>
+            <th style="width:22%">Ca học</th>
+            <th style="width:22%">Ngày học</th>
+            <th style="width:18%">Điện thoại</th>
+            <th style="width:36px"></th>
+          </tr>
+        </thead>
+        <tbody id="list-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedSess='';
+let selectedDays=[];
+let registrations=[];
+
+function selectSess(s){
+  selectedSess=s;
+  document.getElementById('opt-a').className='radio-opt'+(s==='A'?' active-a':'');
+  document.getElementById('opt-b').className='radio-opt'+(s==='B'?' active-b':'');
+  document.getElementById('err-sess').classList.remove('show');
+}
+
+function toggleDay(d){
+  const idx=selectedDays.indexOf(d);
+  if(idx>=0) selectedDays.splice(idx,1);
+  else selectedDays.push(d);
+  document.querySelectorAll('.day-btn').forEach(b=>{
+    b.className='day-btn'+(selectedDays.includes(b.textContent.trim())?' sel':'');
+  });
+  if(selectedDays.length) document.getElementById('err-day').classList.remove('show');
+}
+
+function submitForm(){
+  let ok=true;
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){document.getElementById('err-name').classList.add('show');ok=false;}
+  else document.getElementById('err-name').classList.remove('show');
+  if(!selectedSess){document.getElementById('err-sess').classList.add('show');ok=false;}
+  if(!selectedDays.length){document.getElementById('err-day').classList.add('show');ok=false;}
+  if(!ok) return;
+
+  const ORDER=['T2','T3','T4','T5','T6','T7','CN'];
+  const sortedDays=[...selectedDays].sort((a,b)=>ORDER.indexOf(a)-ORDER.indexOf(b));
+
+  registrations.push({
+    id: registrations.length+1,
+    name,
+    dob: document.getElementById('f-dob').value,
+    phone: document.getElementById('f-phone').value.trim(),
+    school: document.getElementById('f-school').value.trim(),
+    sess: selectedSess,
+    days: sortedDays,
+    note: document.getElementById('f-note').value.trim(),
+    time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+  });
+
+  const banner=document.getElementById('success-banner');
+  document.getElementById('success-msg').textContent=`Đăng ký thành công cho ${name} – Ca ${selectedSess} (${sortedDays.join(', ')})`;
+  banner.classList.add('show');
+  setTimeout(()=>banner.classList.remove('show'),4000);
+
+  resetForm();
+  renderList();
+}
+
+function resetForm(){
+  document.getElementById('f-name').value='';
+  document.getElementById('f-dob').value='';
+  document.getElementById('f-phone').value='';
+  document.getElementById('f-school').value='';
+  document.getElementById('f-note').value='';
+  selectedSess='';
+  selectedDays=[];
+  document.getElementById('opt-a').className='radio-opt';
+  document.getElementById('opt-b').className='radio-opt';
+  document.querySelectorAll('.day-btn').forEach(b=>b.className='day-btn');
+  ['err-name','err-sess','err-day'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+function renderList(){
+  const sec=document.getElementById('list-section');
+  if(!registrations.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  const cntA=registrations.filter(r=>r.sess==='A').length;
+  const cntB=registrations.filter(r=>r.sess==='B').length;
+  document.getElementById('stats').innerHTML=
+    `<span class="stat-pill stat-all">${registrations.length} học viên</span>`+
+    `<span class="stat-pill stat-a">Ca A: ${cntA}</span>`+
+    `<span class="stat-pill stat-b">Ca B: ${cntB}</span>`;
+  const tbody=document.getElementById('list-body');
+  tbody.innerHTML='';
+  registrations.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="color:var(--color-text-secondary)">${i+1}</td>
+      <td style="font-weight:500">${r.name}</td>
+      <td><span class="badge badge-${r.sess.toLowerCase()}">Ca ${r.sess} · ${r.sess==='A'?'6:00–8:00':'8:00–10:00'}</span></td>
+      <td>${r.days.join(', ')}</td>
+      <td style="color:var(--color-text-secondary)">${r.phone||'—'}</td>
+      <td><button class="del-btn" onclick="deleteReg(${i})" aria-label="Xoá ${r.name}"><i class="ti ti-trash" style="font-size:14px" aria-hidden="true"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function deleteReg(i){
+  registrations.splice(i,1);
+  registrations.forEach((r,idx)=>r.id=idx+1);
+  renderList();
+}
+
+function exportList(){
+  if(!registrations.length) return;
+  let txt='DANH SÁCH ĐĂNG KÝ – LỚP TOÁN NÂNG CAO 7\n';
+  txt+='Ca A: 6:00–8:00 | Ca B: 8:00–10:00\n';
+  txt+='='.repeat(55)+'\n';
+  registrations.forEach((r,i)=>{
+    txt+=`${i+1}. ${r.name}\n`;
+    txt+=`   Ca học : Ca ${r.sess} (${r.sess==='A'?'6:00–8:00':'8:00–10:00'})\n`;
+    txt+=`   Ngày học: ${r.days.join(', ')}\n`;
+    if(r.dob) txt+=`   Ngày sinh: ${r.dob}\n`;
+    if(r.phone) txt+=`   ĐT phụ huynh: ${r.phone}\n`;
+    if(r.school) txt+=`   Trường: ${r.school}\n`;
+    if(r.note) txt+=`   Ghi chú: ${r.note}\n`;
+    txt+='\n';
+  });
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='dang_ky_toan_nang_cao_7.txt';
+  a.click();
+}
+</script>
