@@ -508,27 +508,24 @@ function renderBoard(){
 function renderList(){
   const fr = filteredRegs();
   const lv = document.getElementById('listView');
-  if(!fr.length){ lv.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px">Chưa có học viên nào đăng ký thỏa mãn bộ lọc</div>`; return; }
-  
-  lv.innerHTML = '<div class="reglist">' + fr.map((r, i) => {
-    const init = r.name.split(' ').slice(-2).map(w => w[0] || '').join('').toUpperCase().slice(0, 2);
-    const tags = DAYS.filter(d => r.schedule[d.k]).map(d => {
-      const ca = r.schedule[d.k];
-      return `<span class="lt lt${ca.toLowerCase()}">${d.l} Ca ${ca}</span>`;
-    }).join('');
+  if(!fr.length){lv.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px">Chưa có học viên nào đăng ký</div>`;return;}
+  lv.innerHTML='<div class="reglist">'+fr.map((r,i)=>{
+    const init=r.name.split(' ').slice(-2).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+    const tags=DAYS.filter(d=>r.schedule[d.k]).map(d=>{const ca=r.schedule[d.k];return `<span class="lt lt${ca.toLowerCase()}">${d.l} Ca ${ca}</span>`;}).join('');
     
+    // ĐÃ SỬA: Truyền đầy đủ ID và Tên học viên vào hàm delReg để tự động xóa trên Google Sheets
     return `<div class="rl-item">
       <div class="rl-top">
         <div class="rl-av">${init}</div>
         <div style="flex:1">
           <div class="rl-name">${r.name}</div>
-          ${r.phone ? `<div style="font-size:12px;color:var(--color-text-secondary)">${r.phone}${r.school ? ' · ' + r.school : ''}</div>` : ''}
+          ${r.phone?`<div style="font-size:12px;color:var(--color-text-secondary)">${r.phone}${r.school?' · '+r.school:''}</div>`:''}
         </div>
         <button class="delreg" onclick="delReg('${r.id}', '${r.name}')" aria-label="Xoá ${r.name}"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button>
       </div>
       <div class="rl-tags">${tags}</div>
     </div>`;
-  }).join('') + '</div>';
+  }).join('')+'</div>';
 }
 
 // --- HÀM XÓA DỮ LIỆU TRỰC TIẾP TRÊN CLOUD SHEET ---
