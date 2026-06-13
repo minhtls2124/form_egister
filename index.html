@@ -219,43 +219,105 @@ body,div{font-family:'Nunito',sans-serif;color:var(--color-text-primary)}
 </div>
 
 <script>
-const DAYS=[{k:'T2',l:'Thứ 2'},{k:'T3',l:'Thứ 3'},{k:'T4',l:'Thứ 4'},{k:'T5',l:'Thứ 5'},{k:'T6',l:'Thứ 6'},{k:'T7',l:'Thứ 7'},{k:'CN',l:'Chủ nhật'}];
-const ADMIN_PW='admin123';
-let chosen={};
-let regs=[];
-let curFilter='all';
-let curView='board';
+// ==========================================================================
+// ⚠️ BƯỚC QUAN TRỌNG: Hãy thay link API SheetDB của bạn vào giữa hai dấu nháy dưới đây
+// ==========================================================================
+const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/wpz0p6oyo9x5j'; 
 
-function loadRegs(){
-  try{const s=localStorage.getItem('toan7_regs');if(s)regs=JSON.parse(s);}catch(e){}
-}
-function saveRegs(){
-  try{localStorage.setItem('toan7_regs',JSON.stringify(regs));}catch(e){}
-}
-loadRegs();
+const DAYS = [
+  {k:'T2', l:'Thứ 2'},
+  {k:'T3', l:'Thứ 3'},
+  {k:'T4', l:'Thứ 4'},
+  {k:'T5', l:'Thứ 5'},
+  {k:'T6', l:'Thứ 6'},
+  {k:'T7', l:'Thứ 7'},
+  {k:'CN', l:'Chủ nhật'}
+];
+const ADMIN_PW = 'admin123';
+let chosen = {};
+let regs = [];
+let curFilter = 'all';
+let curView = 'board';
 
+// --- ĐỒNG BỘ DỮ LIỆU TỪ CLOUD VỀ TRANG WEB ---
+function loadRegsFromCloud() {
+  return fetch(SHEETDB_API_URL)
+    .then(response => response.json())
+    .then(data => {
+      // Dịch ngược chuỗi dữ liệu từ Google Sheets (ví dụ "T3:A, T4:B") thành Object để phục vụ giao diện cũ
+      regs = data.map(item => {
+        let scheduleObj = {};
+        if (item.schedule) {
+          item.schedule.split(', ').forEach(part => {
+            const [day, ca] = part.split(':');
+            if (day && ca) scheduleObj[day.trim()] = ca.trim();
+          });
+        }
+        return {
+          id: item.id,
+          name: item.name,
+          dob: item.dob,
+          phone: item.phone,
+          school: item.school,
+          note: item.note,
+          schedule: scheduleObj,
+          ts: item.ts
+        };
+      });
+    })
+    .catch(err => {
+      console.error("Lỗi khi đồng bộ dữ liệu đám mây:", err);
+    });
+}
+
+// --- HIỆU ỨNG NỀN CANVAS STARS (Giữ nguyên gốc của bạn) ---
 (function stars(){
-  const c=document.getElementById('sc1');if(!c)return;
-  const ctx=c.getContext('2d');
-  const W=c.parentElement.offsetWidth||680,H=c.parentElement.offsetHeight||220;
-  c.width=W;c.height=H;
-  const s=Array.from({length:40},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.5,a:Math.random(),da:(Math.random()*.02+.005)*(Math.random()<.5?1:-1)}));
-  function draw(){ctx.clearRect(0,0,W,H);s.forEach(p=>{p.a+=p.da;if(p.a>1||p.a<0)p.da=-p.da;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.a.toFixed(2)})`;ctx.fill();});requestAnimationFrame(draw);}
+  const c = document.getElementById('sc1'); if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.parentElement.offsetWidth || 680, H = c.parentElement.offsetHeight || 220;
+  c.width = W; c.height = H;
+  const s = Array.from({length:40}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 2 + .5,
+    a: Math.random(),
+    da: (Math.random() * .02 + .005) * (Math.random() < .5 ? 1 : -1)
+  }));
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    s.forEach(p => {
+      p.a += p.da; if(p.a > 1 || p.a < 0) p.da = -p.da;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${p.a.toFixed(2)})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
   draw();
 })();
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+// --- CHUYỂN TRANG (Tự động kéo data khi click vào trang Admin) ---
+async function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(id==='pgAdmin') renderAdmin();
+  
+  if(id === 'pgAdmin') {
+    // Hiển thị trạng thái loading chờ đồng bộ dữ liệu
+    const boardView = document.getElementById('boardView');
+    const listView = document.getElementById('listView');
+    boardView.innerHTML = '<div style="text-align:center;padding:3rem;font-size:14px;color:#7F77DD;"><i class="ti ti-loader" style="animation: spin 1s linear infinite; font-size:24px; display:inline-block; margin-bottom:8px;"></i><br>Đang đồng bộ danh sách trực tiếp từ Google Sheets...</div>';
+    listView.innerHTML = '';
+    
+    await loadRegsFromCloud();
+    renderAdmin();
+  }
 }
 
 function buildDayRows(){
-  const wrap=document.getElementById('daySchedule');wrap.innerHTML='';
-  DAYS.forEach(d=>{
-    const row=document.createElement('div');
-    row.className='drow';row.id='row-'+d.k;
-    row.innerHTML=`<span class="dname"><i class="ti ti-calendar-event" style="font-size:13px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>${d.l}</span>
+  const wrap = document.getElementById('daySchedule'); wrap.innerHTML = '';
+  DAYS.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'drow'; row.id = 'row-' + d.k;
+    row.innerHTML = `<span class="dname"><i class="ti ti-calendar-event" style="font-size:13px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>${d.l}</span>
     <div class="cbtns">
       <button class="cbtn" id="bA-${d.k}" onclick="pickCa('${d.k}','A')"><i class="ti ti-sun" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca A <span style="opacity:.7;font-size:11px">6–8h</span></button>
       <button class="cbtn" id="bB-${d.k}" onclick="pickCa('${d.k}','B')"><i class="ti ti-sun-high" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> Ca B <span style="opacity:.7;font-size:11px">8–10h</span></button>
@@ -266,190 +328,282 @@ function buildDayRows(){
   });
 }
 
-function pickCa(day,ca){
-  chosen[day]=ca;
-  document.getElementById('row-'+day).className='drow h'+ca.toLowerCase();
-  document.getElementById('bA-'+day).className='cbtn'+(ca==='A'?' ona':'');
-  document.getElementById('bB-'+day).className='cbtn'+(ca==='B'?' onb':'');
-  document.getElementById('bc-'+day).style.display='';
-  const db=document.getElementById('db-'+day);
-  db.className='dbadge db'+ca.toLowerCase();db.textContent='Ca '+ca;
+function pickCa(day, ca){
+  chosen[day] = ca;
+  document.getElementById('row-' + day).className = 'drow h' + ca.toLowerCase();
+  document.getElementById('bA-' + day).className = 'cbtn' + (ca === 'A' ? ' ona' : '');
+  document.getElementById('bB-' + day).className = 'cbtn' + (ca === 'B' ? ' onb' : '');
+  document.getElementById('bc-' + day).style.display = '';
+  const db = document.getElementById('db-' + day);
+  db.className = 'dbadge db' + ca.toLowerCase(); db.textContent = 'Ca ' + ca;
   document.getElementById('err-day').classList.remove('show');
   updateSum();
 }
 
 function clearCa(day){
   delete chosen[day];
-  document.getElementById('row-'+day).className='drow';
-  document.getElementById('bA-'+day).className='cbtn';
-  document.getElementById('bB-'+day).className='cbtn';
-  document.getElementById('bc-'+day).style.display='none';
-  const db=document.getElementById('db-'+day);
-  db.className='dbadge dbn';db.textContent='Chưa chọn';
+  document.getElementById('row-' + day).className = 'drow';
+  document.getElementById('bA-' + day).className = 'cbtn';
+  document.getElementById('bB-' + day).className = 'cbtn';
+  document.getElementById('bc-' + day).style.display = 'none';
+  const db = document.getElementById('db-' + day);
+  db.className = 'dbadge dbn'; db.textContent = 'Chưa chọn';
   updateSum();
 }
 
 function updateSum(){
-  const box=document.getElementById('sumbox'),row=document.getElementById('sumrow');
-  const ks=Object.keys(chosen);
-  if(!ks.length){box.classList.remove('show');return;}
+  const box = document.getElementById('sumbox'), row = document.getElementById('sumrow');
+  const ks = Object.keys(chosen);
+  if(!ks.length){ box.classList.remove('show'); return; }
   box.classList.add('show');
-  row.innerHTML=ks.map(k=>{const d=DAYS.find(x=>x.k===k);const ca=chosen[k];return `<span class="sc-${ca.toLowerCase()}">${d.l} · Ca ${ca}</span>`;}).join('');
+  row.innerHTML = ks.map(k => {
+    const d = DAYS.find(x => x.k === k);
+    const ca = chosen[k];
+    return `<span class="sc-${ca.toLowerCase()}">${d.l} · Ca ${ca}</span>`;
+  }).join('');
 }
 
+// --- HÀM SUBMIT ĐẨY DỮ LIỆU LÊN GOOGLE SHEETS ---
 function doSubmit(){
-  const name=document.getElementById('f-name').value.trim();
-  let ok=true;
-  if(!name){document.getElementById('err-name').classList.add('show');ok=false;}
+  const name = document.getElementById('f-name').value.trim();
+  let ok = true;
+  if(!name){ document.getElementById('err-name').classList.add('show'); ok = false; }
   else document.getElementById('err-name').classList.remove('show');
-  if(!Object.keys(chosen).length){document.getElementById('err-day').classList.add('show');ok=false;}
-  if(!ok)return;
-  const rec={id:Date.now(),name,dob:document.getElementById('f-dob').value,phone:document.getElementById('f-phone').value.trim(),school:document.getElementById('f-school').value.trim(),note:document.getElementById('f-note').value.trim(),schedule:{...chosen},ts:new Date().toLocaleString('vi-VN')};
-  regs.push(rec);saveRegs();
-  const tags=DAYS.filter(d=>rec.schedule[d.k]).map(d=>{const ca=rec.schedule[d.k];return `<span class="sc-${ca.toLowerCase()}">${d.l}: Ca ${ca} (${ca==='A'?'6–8h':'8–10h'})</span>`;}).join(' ');
-  document.getElementById('sucSub').textContent=`Chào mừng ${name} đến với lớp Toán nâng cao 7!`;
-  document.getElementById('sucCard').innerHTML=`<div><b>Họ tên:</b> ${name}</div>`+(rec.phone?`<div><b>SĐT PH:</b> ${rec.phone}</div>`:'')+`<div style="margin-top:6px"><b>Lịch học:</b></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">${tags}</div>`;
-  document.getElementById('formSec').style.display='none';
-  document.getElementById('sucSec').classList.add('show');
-  confetti();
+  if(!Object.keys(chosen).length){ document.getElementById('err-day').classList.add('show'); ok = false; }
+  if(!ok) return;
+
+  // Gom cấu trúc ca học thành chuỗi "T2:A, T4:B" để nhét vừa 1 ô trên Google Sheets
+  const scheduleText = Object.keys(chosen).map(k => `${k}:${chosen[k]}`).join(', ');
+
+  const rec = {
+    id: String(Date.now()),
+    name: name,
+    dob: document.getElementById('f-dob').value,
+    phone: document.getElementById('f-phone').value.trim(),
+    school: document.getElementById('f-school').value.trim(),
+    note: document.getElementById('f-note').value.trim(),
+    schedule: scheduleText,
+    ts: new Date().toLocaleString('vi-VN')
+  };
+
+  // Vô hiệu hóa nút đăng ký tạm thời, tạo hiệu ứng xoay loading để chống spam click
+  const btnSub = document.querySelector('.bsub');
+  const originalBtnText = btnSub.innerHTML;
+  btnSub.innerHTML = '<i class="ti ti-loader" style="animation: spin 1s linear infinite; display:inline-block; margin-right:4px;"></i> Đang xử lý đăng ký...';
+  btnSub.disabled = true;
+
+  // Gọi fetch API gửi lên SheetDB để ghi dữ liệu vào Google Sheets
+  fetch(SHEETDB_API_URL, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: [rec] })
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Tạo cấu trúc thẻ hiển thị thông báo thành công đẹp mắt
+    const tags = DAYS.filter(d => chosen[d.k]).map(d => {
+      const ca = chosen[d.k];
+      return `<span class="sc-${ca.toLowerCase()}">${d.l}: Ca ${ca} (${ca==='A'?'6–8h':'8–10h'})</span>`;
+    }).join(' ');
+    
+    document.getElementById('sucSub').textContent = `Chào mừng ${name} đến với lớp Toán nâng cao 7!`;
+    document.getElementById('sucCard').innerHTML = `<div><b>Họ tên:</b> ${name}</div>` + (rec.phone ? `<div><b>SĐT PH:</b> ${rec.phone}</div>` : '') + `<div style="margin-top:6px"><b>Lịch học đã chọn:</b></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">${tags}</div>`;
+    
+    document.getElementById('formSec').style.display = 'none';
+    document.getElementById('sucSec').classList.add('show');
+    confetti(); // Bắn pháo hoa ăn mừng
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Không thể kết nối đến máy chủ lưu trữ. Vui lòng kiểm tra lại mạng kết nối!');
+  })
+  .finally(() => {
+    // Trả lại trạng thái ban đầu cho nút bấm
+    btnSub.innerHTML = originalBtnText;
+    btnSub.disabled = false;
+  });
 }
 
 function newReg(){
-  chosen={};
+  chosen = {};
   document.getElementById('sucSec').classList.remove('show');
-  document.getElementById('formSec').style.display='block';
-  ['f-name','f-dob','f-phone','f-school','f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('formSec').style.display = 'block';
+  ['f-name','f-dob','f-phone','f-school','f-note'].forEach(id => document.getElementById(id).value = '');
   buildDayRows();
   document.getElementById('sumbox').classList.remove('show');
-  ['err-name','err-day'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['err-name','err-day'].forEach(id => document.getElementById(id).classList.remove('show'));
 }
 
-function goAdmin(){showPage('pgLogin');document.getElementById('pwInput').value='';document.getElementById('loginErr').classList.remove('show');}
+function goAdmin(){ showPage('pgLogin'); document.getElementById('pwInput').value = ''; document.getElementById('loginErr').classList.remove('show'); }
 
 function doLogin(){
-  const pw=document.getElementById('pwInput').value;
-  if(pw===ADMIN_PW){showPage('pgAdmin');}
-  else{document.getElementById('loginErr').classList.add('show');}
+  const pw = document.getElementById('pwInput').value;
+  if(pw === ADMIN_PW){ showPage('pgAdmin'); }
+  else{ document.getElementById('loginErr').classList.add('show'); }
 }
 
 function setFilter(f){
-  curFilter=f;
-  document.getElementById('fAll').className='fbtn'+(f==='all'?' fall':'');
-  document.getElementById('fA').className='fbtn'+(f==='A'?' fa':'');
-  document.getElementById('fB').className='fbtn'+(f==='B'?' fb':'');
+  curFilter = f;
+  document.getElementById('fAll').className = 'fbtn' + (f === 'all' ? ' fall' : '');
+  document.getElementById('fA').className = 'fbtn' + (f === 'A' ? ' fa' : '');
+  document.getElementById('fB').className = 'fbtn' + (f === 'B' ? ' fb' : '');
   renderAdmin();
 }
 
 function setView(v){
-  curView=v;
-  document.getElementById('vBoard').className='vtab'+(v==='board'?' on':'');
-  document.getElementById('vList').className='vtab'+(v==='list'?' on':'');
-  document.getElementById('boardView').style.display=v==='board'?'':'none';
-  document.getElementById('listView').style.display=v==='list'?'':'none';
+  curView = v;
+  document.getElementById('vBoard').className = 'vtab' + (v === 'board' ? ' on' : '');
+  document.getElementById('vList').className = 'vtab' + (v === 'list' ? ' on' : '');
+  document.getElementById('boardView').style.display = v === 'board' ? '' : 'none';
+  document.getElementById('listView').style.display = v === 'list' ? '' : 'none';
   renderAdmin();
 }
 
 function filteredRegs(){
-  if(curFilter==='all') return regs;
-  return regs.filter(r=>Object.values(r.schedule).includes(curFilter));
+  if(curFilter === 'all') return regs;
+  return regs.filter(r => Object.values(r.schedule).includes(curFilter));
 }
 
 function renderAdmin(){
-  loadRegs();
-  const cntA=regs.filter(r=>Object.values(r.schedule).includes('A')).length;
-  const cntB=regs.filter(r=>Object.values(r.schedule).includes('B')).length;
-  document.getElementById('statsGrid').innerHTML=`
+  const cntA = regs.filter(r => Object.values(r.schedule).includes('A')).length;
+  const cntB = regs.filter(r => Object.values(r.schedule).includes('B')).length;
+  document.getElementById('statsGrid').innerHTML = `
     <div class="stat-c"><div class="stat-n sn-all">${regs.length}</div><div class="stat-l">Tổng học viên</div></div>
     <div class="stat-c"><div class="stat-n sn-a">${cntA}</div><div class="stat-l">Có ca A</div></div>
     <div class="stat-c"><div class="stat-n sn-b">${cntB}</div><div class="stat-l">Có ca B</div></div>
-    <div class="stat-c"><div class="stat-n" style="color:#BA7517">${DAYS.filter(d=>regs.some(r=>r.schedule[d.k])).length}</div><div class="stat-l">Ngày có học</div></div>`;
-  if(curView==='board') renderBoard();
+    <div class="stat-c"><div class="stat-n" style="color:#BA7517">${DAYS.filter(d => regs.some(r => r.schedule[d.k])).length}</div><div class="stat-l">Ngày có học</div></div>`;
+  
+  if(curView === 'board') renderBoard();
   else renderList();
 }
 
 function renderBoard(){
-  const fr=filteredRegs();
-  const bv=document.getElementById('boardView');
-  bv.innerHTML='<div class="board">'+DAYS.map(d=>{
-    const slots=fr.filter(r=>r.schedule[d.k]);
-    const aSlots=slots.filter(r=>r.schedule[d.k]==='A');
-    const bSlots=slots.filter(r=>r.schedule[d.k]==='B');
-    const headColor=slots.length?'background:linear-gradient(90deg,#EEEDFE,#FBEAF0)':'background:var(--color-background-secondary)';
-    let html=`<div class="day-col"><div class="dc-head" style="${headColor}"><span style="font-weight:800;color:#3C3489">${d.l}</span><span class="dc-sub">${slots.length} học viên</span></div><div class="dc-body">`;
-    if(!slots.length){html+=`<div class="empty-day">Chưa có ai</div>`;}
+  const fr = filteredRegs();
+  const bv = document.getElementById('boardView');
+  bv.innerHTML = '<div class="board">' + DAYS.map(d => {
+    const slots = fr.filter(r => r.schedule[d.k]);
+    const aSlots = slots.filter(r => r.schedule[d.k] === 'A');
+    const bSlots = slots.filter(r => r.schedule[d.k] === 'B');
+    const headColor = slots.length ? 'background:linear-gradient(90deg,#EEEDFE,#FBEAF0)' : 'background:var(--color-background-secondary)';
+    
+    let html = `<div class="day-col"><div class="dc-head" style="${headColor}"><span style="font-weight:800;color:#3C3489">${d.l}</span><span class="dc-sub">${slots.length} học viên</span></div><div class="dc-body">`;
+    if(!slots.length){ html += `<div class="empty-day">Chưa có ai</div>`; }
     else{
-      if(aSlots.length){html+=`<div style="font-size:11px;font-weight:800;color:#534AB7;margin-bottom:4px;padding:2px 6px;background:#EEEDFE;border-radius:8px;display:inline-block">Ca A · 6–8h</div>`;
-      aSlots.forEach(r=>{html+=`<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`;});}
-      if(bSlots.length){html+=`<div style="font-size:11px;font-weight:800;color:#993556;margin:6px 0 4px;padding:2px 6px;background:#FBEAF0;border-radius:8px;display:inline-block">Ca B · 8–10h</div>`;
-      bSlots.forEach(r=>{html+=`<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`;});}
+      if(aSlots.length){
+        html += `<div style="font-size:11px;font-weight:800;color:#534AB7;margin-bottom:4px;padding:2px 6px;background:#EEEDFE;border-radius:8px;display:inline-block">Ca A · 6–8h</div>`;
+        aSlots.forEach(r => { html += `<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`; });
+      }
+      if(bSlots.length){
+        html += `<div style="font-size:11px;font-weight:800;color:#993556;margin:6px 0 4px;padding:2px 6px;background:#FBEAF0;border-radius:8px;display:inline-block">Ca B · 8–10h</div>`;
+        bSlots.forEach(r => { html += `<div class="reg-card"><div class="rc-name">${r.name}</div>${r.phone?`<div class="rc-phone">${r.phone}</div>`:''}</div>`; });
+      }
     }
-    html+=`</div></div>`;return html;
-  }).join('')+'</div>';
+    html += `</div></div>`; return html;
+  }).join('') + '</div>';
 }
 
 function renderList(){
-  const fr=filteredRegs();
-  const lv=document.getElementById('listView');
-  if(!fr.length){lv.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px">Chưa có học viên nào đăng ký</div>`;return;}
-  lv.innerHTML='<div class="reglist">'+fr.map((r,i)=>{
-    const init=r.name.split(' ').slice(-2).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
-    const tags=DAYS.filter(d=>r.schedule[d.k]).map(d=>{const ca=r.schedule[d.k];return `<span class="lt lt${ca.toLowerCase()}">${d.l} Ca${ca}</span>`;}).join('');
+  const fr = filteredRegs();
+  const lv = document.getElementById('listView');
+  if(!fr.length){ lv.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px">Chưa có học viên nào đăng ký thỏa mãn bộ lọc</div>`; return; }
+  
+  lv.innerHTML = '<div class="reglist">' + fr.map((r, i) => {
+    const init = r.name.split(' ').slice(-2).map(w => w[0] || '').join('').toUpperCase().slice(0, 2);
+    const tags = DAYS.filter(d => r.schedule[d.k]).map(d => {
+      const ca = r.schedule[d.k];
+      return `<span class="lt lt${ca.toLowerCase()}">${d.l} Ca ${ca}</span>`;
+    }).join('');
+    
     return `<div class="rl-item">
       <div class="rl-top">
         <div class="rl-av">${init}</div>
         <div style="flex:1">
           <div class="rl-name">${r.name}</div>
-          ${r.phone?`<div style="font-size:12px;color:var(--color-text-secondary)">${r.phone}${r.school?' · '+r.school:''}</div>`:''}
+          ${r.phone ? `<div style="font-size:12px;color:var(--color-text-secondary)">${r.phone}${r.school ? ' · ' + r.school : ''}</div>` : ''}
         </div>
-        <button class="delreg" onclick="delReg('${r.id}')" aria-label="Xoá ${r.name}"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button>
+        <button class="delreg" onclick="delReg('${r.id}', '${r.name}')" aria-label="Xoá ${r.name}"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button>
       </div>
       <div class="rl-tags">${tags}</div>
     </div>`;
-  }).join('')+'</div>';
+  }).join('') + '</div>';
 }
 
-function delReg(id){
-  regs=regs.filter(r=>String(r.id)!==String(id));
-  saveRegs();renderAdmin();
+// --- HÀM XÓA DỮ LIỆU TRỰC TIẾP TRÊN CLOUD SHEET ---
+function delReg(id, studentName){
+  if(!confirm(`Bạn có chắc chắn muốn xóa học viên "${studentName}" ra khỏi danh sách hệ thống?`)) return;
+  
+  // Gọi API DELETE đến SheetDB tìm đúng dòng ID để xóa trên Google Sheets
+  fetch(`${SHEETDB_API_URL}/id/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Xóa xong trên cloud thì lọc mảng cục bộ để giao diện biến mất luôn không cần re-load
+    regs = regs.filter(r => String(r.id) !== String(id));
+    renderAdmin();
+  })
+  .catch(err => {
+    alert("Không thể thực hiện yêu cầu xóa, lỗi đường truyền Internet!");
+  });
 }
 
+// --- XUẤT FILE TXT DANH SÁCH (Giữ nguyên tính năng gốc của bạn) ---
 function exportAdmin(){
-  if(!regs.length)return;
-  let t='DANH SÁCH ĐĂNG KÝ – LỚP TOÁN NÂNG CAO 7\n'+'='.repeat(45)+'\n\n';
-  t+='THEO TỪNG NGÀY:\n'+'-'.repeat(30)+'\n';
-  DAYS.forEach(d=>{
-    const sl=regs.filter(r=>r.schedule[d.k]);
-    if(!sl.length)return;
-    t+=`\n${d.l}:\n`;
-    ['A','B'].forEach(ca=>{
-      const cs=sl.filter(r=>r.schedule[d.k]===ca);
-      if(cs.length) t+=`  Ca ${ca} (${ca==='A'?'6:00-8:00':'8:00-10:00'}): ${cs.map(r=>r.name).join(', ')}\n`;
+  if(!regs.length) return;
+  let t = 'DANH SÁCH ĐĂNG KÝ – LỚP TOÁN NÂNG CAO 7\n' + '='.repeat(45) + '\n\n';
+  t += 'THEO TỪNG NGÀY:\n' + '-'.repeat(30) + '\n';
+  DAYS.forEach(d => {
+    const sl = regs.filter(r => r.schedule[d.k]);
+    if(!sl.length) return;
+    t += `\n${d.l}:\n`;
+    ['A', 'B'].forEach(ca => {
+      const cs = sl.filter(r => r.schedule[d.k] === ca);
+      if(cs.length) t += `  Ca ${ca} (${ca === 'A' ? '6:00-8:00' : '8:00-10:00'}): ${cs.map(r => r.name).join(', ')}\n`;
     });
   });
-  t+='\nDANH SÁCH HỌC VIÊN:\n'+'-'.repeat(30)+'\n';
-  regs.forEach((r,i)=>{
-    t+=`${i+1}. ${r.name}\n`;
-    if(r.phone) t+=`   SĐT: ${r.phone}\n`;
-    if(r.school) t+=`   Trường: ${r.school}\n`;
-    t+='   Lịch:\n';
-    DAYS.filter(d=>r.schedule[d.k]).forEach(d=>{const ca=r.schedule[d.k];t+=`     ${d.l}: Ca ${ca} (${ca==='A'?'6:00-8:00':'8:00-10:00'})\n`;});
-    t+='\n';
+  t += '\nDANH SÁCH HỌC VIÊN:\n' + '-'.repeat(30) + '\n';
+  regs.forEach((r, i) => {
+    t += `${i+1}. ${r.name}\n`;
+    if(r.phone) t += `   SĐT: ${r.phone}\n`;
+    if(r.school) t += `   Trường: ${r.school}\n`;
+    t += '   Lịch:\n';
+    DAYS.filter(d => r.schedule[d.k]).forEach(d => {
+      const ca = r.schedule[d.k]; t += `     ${d.l}: Ca ${ca} (${ca === 'A' ? '6:00-8:00' : '8:00-10:00'})\n`;
+    });
+    t += '\n';
   });
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));
-  a.download='admin_toan_nang_cao_7.txt';a.click();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([t], {type: 'text/plain;charset=utf-8'}));
+  a.download = 'admin_toan_nang_cao_7.txt'; a.click();
 }
 
+// --- HIỆU ỨNG PHÁO HOA CHÚC MỪNG (Giữ nguyên của bạn) ---
 function confetti(){
-  const colors=['#7F77DD','#D4537E','#EF9F27','#5DCAA5','#378ADD'];
-  const c=document.getElementById('sucSec');c.style.position='relative';
-  for(let i=0;i<52;i++){
-    const el=document.createElement('div');const sz=Math.random()*8+5;
-    el.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'3px'};background:${colors[Math.floor(Math.random()*colors.length)]};top:0;left:${Math.random()*100}%;pointer-events:none;z-index:10`;
+  const colors = ['#7F77DD', '#D4537E', '#EF9F27', '#5DCAA5', '#378ADD'];
+  const c = document.getElementById('sucSec'); c.style.position = 'relative';
+  for(let i=0; i<52; i++){
+    const el = document.createElement('div'); const sz = Math.random() * 8 + 5;
+    el.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'3px'};background:${colors[Math.floor(Math.random()*colors.length)]};top:0;left:${Math.random()*100}%;pointer-events:none;z-index:10`;
     c.appendChild(el);
-    el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:`translate(${(Math.random()-.5)*200}px,${Math.random()*280+80}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:1200+Math.random()*800,delay:Math.random()*300,easing:'cubic-bezier(.25,.46,.45,.94)',fill:'forwards'}).onfinish=()=>el.remove();
+    el.animate([
+      {transform: 'translate(0,0) rotate(0deg)', opacity: 1},
+      {transform: `translate(${(Math.random()-.5)*200}px,${Math.random()*280+80}px) rotate(${Math.random()*720}deg)`, opacity: 0}
+    ], {
+      duration: 1200 + Math.random() * 800,
+      delay: Math.random() * 300,
+      easing: 'cubic-bezier(.25,.46,.45,.94)',
+      fill: 'forwards'
+    }).onfinish = () => el.remove();
   }
 }
 
+// Khởi chạy vẽ các hàng lịch ban đầu khi tải web
 buildDayRows();
 </script>
